@@ -1,0 +1,7 @@
+{
+    "host": "irc.example.com",
+    "port": "6697",
+    "channel": "#cc",
+    "herder": "nickserv_lol",
+    "exfil": "http://example.com/dump"
+}

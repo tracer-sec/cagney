@@ -1,0 +1,9 @@
+bin
+build
+.vs
+*.sdf
+*.opendb
+*.vcxproj.filters
+*.vcxproj.user
+etc/config.json
+etc/cc.cer
