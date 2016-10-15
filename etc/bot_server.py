@@ -35,8 +35,8 @@ class BotServer(object):
     def start(self):
         print('Running')
         while (True):
-            ready_list, _, _ = select.select([self.bot_socket, self.client_socket], [], [])
-            print(ready_list)
+            ready_list, _, _ = select.select([self.bot_socket, self.client_socket], [], [], 3)
+            #print(ready_list)
             if self.bot_socket in ready_list:
                 self.on_bot_accept()
             if self.client_socket in ready_list:
@@ -49,6 +49,7 @@ class BotServer(object):
         b = Bot(bot_connection, self)
         self.bots.append(b)
         t = threading.Thread(target=b.loop)
+        t.daemon = True
         t.start()
         self.__threads.append(t)
         
@@ -59,6 +60,7 @@ class BotServer(object):
             c = Client(client_connection, self)
             self.client = c
             t = threading.Thread(target=c.loop)
+            t.daemon = True
             t.start()
             self.__threads.append(t)
         else:
@@ -78,7 +80,7 @@ class BotServer(object):
         else:
             for bot in self.bots:
                 self.client.send(bot.bot_id)
-        
+            self.client.send('____END')
 
 class Bot(object):
     def __init__(self, socket, server):
@@ -113,7 +115,7 @@ class Bot(object):
     def loop(self):
         self.__running = True
         while self.__running:
-            time.sleep(0.5)
+            time.sleep(0.1)
             self.recv()
         
         
@@ -125,8 +127,9 @@ class Client(object):
         self.server = server
         
     def send(self, data):
+        print('CLIENT < {0}'.format(data))
         self.__socket.sendall(data + '\r\n')
-           
+        
     def recv(self, buffer_size=1024):
         while '\r\n' not in self.__buffer:
             self.__buffer = self.__buffer + self.__socket.recv(buffer_size)
@@ -141,7 +144,7 @@ class Client(object):
     def loop(self):
         self.__running = True
         while self.__running:
-            time.sleep(0.5)
+            time.sleep(0.1)
             self.recv()
         
 

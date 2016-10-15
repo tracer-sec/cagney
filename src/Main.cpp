@@ -73,7 +73,7 @@ void MainThread(unsigned int parentThreadId)
     while (true)
     {
         auto message = cc->Receive();
-        if (message == "quit")
+        if (message == "quit" || message == "") // blank messages mean error. Need to fix that, really :/
         {
             #ifdef _WIN32
             ::PostThreadMessage(parentThreadId, WM_QUIT, 0, 0);
@@ -125,7 +125,9 @@ void MainThread(unsigned int parentThreadId)
             DataLoader::DumpToFile(Utils::WideFromString(path), response.body);
         }
         else if (message == "hello")
+        {
             cc->Send("hello");
+        }
     }
 }
 
