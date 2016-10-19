@@ -78,9 +78,18 @@ class BotServer(object):
             if len(bot_list) > 0:
                 bot_list[0].send(m.message)
         else:
+            self.handle_server_message(message)
+
+    def handle_server_message(self, message):
+        if message == 'bot_list':
+            full_list = ';'.join(map(lambda x: x.bot_id, self.bots))
+            print(full_list)
             for bot in self.bots:
-                self.client.send(bot.bot_id)
-            self.client.send('____END')
+                self.client.send('[bot_list]|' + bot.bot_id)
+            self.client.send('[bot_list]|____END')
+        else:
+            self.client.send('[-]|unknown command: ' + message)
+            
 
 class Bot(object):
     def __init__(self, socket, server):
@@ -108,9 +117,14 @@ class Bot(object):
                 self.server.on_bot_message('{0}|{1}'.format(self.bot_id, line))
                 # send message back to client
             else:
-                self.handshake_completed = True
-                self.bot_id = line
-                print('Bot registered: {0}'.format(self.bot_id))
+                if line in map(lambda x: x.bot_id, self.server.bots):
+                    # Dupe
+                    self.send('DUPE')
+                else:
+                    self.handshake_completed = True
+                    self.bot_id = line
+                    self.send('OK')
+                    print('Bot registered: {0}'.format(self.bot_id))
         
     def loop(self):
         self.__running = True
