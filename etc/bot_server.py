@@ -83,10 +83,7 @@ class BotServer(object):
     def handle_server_message(self, message):
         if message == 'bot_list':
             full_list = ';'.join(map(lambda x: x.bot_id, self.bots))
-            print(full_list)
-            for bot in self.bots:
-                self.client.send('[bot_list]|' + bot.bot_id)
-            self.client.send('[bot_list]|____END')
+            self.client.send('[bot_list]|' + full_list)
         else:
             self.client.send('[-]|unknown command: ' + message)
             
