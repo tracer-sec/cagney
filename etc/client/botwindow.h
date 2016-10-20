@@ -19,6 +19,9 @@ public:
     QString GetBotId() { return botId_; }
     void AddMessage(QString line);
 
+protected:
+    virtual void resizeEvent(QResizeEvent *event) override;
+
 signals:
     void sendCommand(QString botId, QString message);
 

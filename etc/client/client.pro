@@ -23,3 +23,7 @@ HEADERS  += mainwindow.h \
 
 FORMS    += mainwindow.ui \
     botwindow.ui
+
+unix {
+    QMAKE_CXXFLAGS += -std=c++11
+}

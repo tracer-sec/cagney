@@ -89,7 +89,7 @@ void MainWindow::dataReceived(QString line)
         }
 
         if (botWindow != nullptr)
-            botWindow->AddMessage(message);
+            botWindow->AddMessage("< " + message);
     }
 }
 

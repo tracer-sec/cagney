@@ -11,6 +11,8 @@ BotWindow::BotWindow(QString botId, QWidget *parent) :
 
     ui->textBuffer->setModel(&model_);
 
+    ui->commandInput->setFocus();
+
     connect(ui->commandInput, &QLineEdit::returnPressed,
             this, &BotWindow::commandEntered);
 }
@@ -25,10 +27,18 @@ void BotWindow::AddMessage(QString line)
     model_.insertRow(model_.rowCount());
     QModelIndex index = model_.index(model_.rowCount() - 1);
     model_.setData(index, line);
+    ui->textBuffer->scrollToBottom();
+}
+
+void BotWindow::resizeEvent(QResizeEvent *event)
+{
+    ui->textBuffer->scrollToBottom();
 }
 
 void BotWindow::commandEntered()
 {
-    emit sendCommand(botId_, ui->commandInput->text());
+    QString line(ui->commandInput->text());
+    AddMessage("> " + line);
+    emit sendCommand(botId_, line);
     ui->commandInput->clear();
 }
