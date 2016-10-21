@@ -32,6 +32,7 @@ void BotWindow::AddMessage(QString line)
 
 void BotWindow::resizeEvent(QResizeEvent *event)
 {
+    Q_UNUSED(event);
     ui->textBuffer->scrollToBottom();
 }
 

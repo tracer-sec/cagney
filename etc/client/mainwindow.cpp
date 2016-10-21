@@ -12,8 +12,6 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    connect(ui->pushButton, &QPushButton::clicked,
-        this, &MainWindow::requestBotList);
     connect(ui->botList, &QListWidget::itemDoubleClicked,
         this, &MainWindow::botSelected);
     connect(&connection_, &Connection::dataReceived,
@@ -49,19 +47,16 @@ void MainWindow::botSelected(QListWidgetItem *item)
 
     if (botWindow == nullptr)
     {
-        botWindow = new BotWindow(botId, this);
-        s = ui->messageWindowContainer->addSubWindow(botWindow);
+        auto subWindow = new QMdiSubWindow(this);
+        botWindow = new BotWindow(botId);
+        subWindow->setWidget(botWindow);
+        s = ui->messageWindowContainer->addSubWindow(subWindow);
         connect(botWindow, &BotWindow::sendCommand,
                 this, &MainWindow::sendMessage);
     }
 
     botWindow->show();
     ui->messageWindowContainer->setActiveSubWindow(s);
-}
-
-void MainWindow::requestBotList()
-{
-    connection_.GetBotNames();
 }
 
 void MainWindow::dataReceived(QString line)
@@ -96,4 +91,14 @@ void MainWindow::dataReceived(QString line)
 void MainWindow::sendMessage(QString botId, QString message)
 {
     connection_.Send(botId + "|" + message);
+}
+
+void MainWindow::on_actionRefresh_triggered()
+{
+    connection_.GetBotNames();
+}
+
+void MainWindow::on_actionExit_triggered()
+{
+    QApplication::quit();
 }

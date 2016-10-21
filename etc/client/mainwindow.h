@@ -20,8 +20,11 @@ public:
 public slots:
     void botSelected(QListWidgetItem *item);
     void dataReceived(QString line);
-    void requestBotList();
     void sendMessage(QString botId, QString message);
+
+private slots:
+    void on_actionRefresh_triggered();
+    void on_actionExit_triggered();
 
 private:
     void UpdateBotList(QStringList botNames);
