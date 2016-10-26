@@ -86,6 +86,11 @@ class BotServer(object):
             self.client.send('[bot_list]|' + full_list)
         else:
             self.client.send('[-]|unknown command: ' + message)
+
+    def bot_leaving(self, bot):
+        self.bots.remove(bot)
+        print('Bot leaving: ' + bot.bot_id)
+        # what about thread?
             
 
 class Bot(object):
@@ -103,7 +108,10 @@ class Bot(object):
            
     def recv(self, buffer_size=1024):
         while '\r\n' not in self.__buffer:
-            self.__buffer = self.__buffer + self.__socket.recv(buffer_size)
+            data = self.__socket.recv(buffer_size)
+            if len(data) == 0:
+                return False
+            self.__buffer = self.__buffer + data
         
         while '\r\n' in self.__buffer:
             i = self.__buffer.find('\r\n')
@@ -122,13 +130,19 @@ class Bot(object):
                     self.bot_id = line
                     self.send('OK')
                     print('Bot registered: {0}'.format(self.bot_id))
+
+        return True
+
         
     def loop(self):
         self.__running = True
         while self.__running:
             time.sleep(0.1)
-            self.recv()
-        
+            if not self.recv():
+                break;
+        self.__running = False
+        self.server.bot_leaving(self)
+
         
 class Client(object):
     def __init__(self, socket, server):

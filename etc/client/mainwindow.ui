@@ -39,7 +39,6 @@
     <property name="title">
      <string>File</string>
     </property>
-    <addaction name="actionRefresh"/>
     <addaction name="actionExit"/>
    </widget>
    <addaction name="menuFile"/>
@@ -51,6 +50,7 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+   <addaction name="actionRefresh"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionExit">
@@ -61,6 +61,9 @@
   <action name="actionRefresh">
    <property name="text">
     <string>Refresh</string>
+   </property>
+   <property name="toolTip">
+    <string>Refresh bot list</string>
    </property>
   </action>
  </widget>
