@@ -120,6 +120,10 @@ void MainThread(unsigned int parentThreadId)
             
             string path = Processes::GetExecutablePath() + Legit::SEPARATOR + "test.bin";
             DataLoader::DumpToFile(Utils::WideFromString(path), response.body);
+
+            ostringstream ss;
+            ss << Utils::FriendlySize(response.body.size()) << " downloaded to " << path;
+            cc->Send(ss.str());
         }
         else if (message == "hello")
         {
