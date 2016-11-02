@@ -16,6 +16,8 @@ MainWindow::MainWindow(QWidget *parent) :
         this, &MainWindow::botSelected);
     connect(&connection_, &Connection::dataReceived,
         this, &MainWindow::dataReceived);
+
+    on_actionRefresh_triggered();
 }
 
 MainWindow::~MainWindow()
