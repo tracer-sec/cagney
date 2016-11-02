@@ -91,7 +91,11 @@ class BotServer(object):
         self.bots.remove(bot)
         print('Bot leaving: ' + bot.bot_id)
         # what about thread?
-            
+        
+    def client_leaving(self):
+        self.client = None
+        print('Client leaving')
+        
 
 class Bot(object):
     def __init__(self, socket, server):
@@ -157,7 +161,10 @@ class Client(object):
         
     def recv(self, buffer_size=1024):
         while '\r\n' not in self.__buffer:
-            self.__buffer = self.__buffer + self.__socket.recv(buffer_size)
+            data = self.__socket.recv(buffer_size)
+            if len(data) == 0:
+                return False
+            self.__buffer = self.__buffer + data
         
         while '\r\n' in self.__buffer:
             i = self.__buffer.find('\r\n')
@@ -165,12 +172,16 @@ class Client(object):
             self.__buffer = self.__buffer[i + 2:]
             print('CLIENT > {0}'.format(line))
             self.server.on_client_message(line)
+            
+        return True
         
     def loop(self):
         self.__running = True
         while self.__running:
             time.sleep(0.1)
-            self.recv()
+            if not self.recv():
+                break;
+        self.server.client_leaving()
         
 
 if __name__ == '__main__':
