@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "botwindow.h"
+#include "connectiondialog.h"
 
 #include <QMdiSubWindow>
 
@@ -8,20 +9,20 @@ using namespace std;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow)
+    ui(new Ui::MainWindow),
+    connection_(nullptr)
 {
     ui->setupUi(this);
 
     connect(ui->botList, &QListWidget::itemDoubleClicked,
         this, &MainWindow::botSelected);
-    connect(&connection_, &Connection::dataReceived,
-        this, &MainWindow::dataReceived);
 
-    on_actionRefresh_triggered();
+    on_actionConnect_triggered();
 }
 
 MainWindow::~MainWindow()
 {
+    delete connection_;
     delete ui;
 }
 
@@ -92,15 +93,35 @@ void MainWindow::dataReceived(QString line)
 
 void MainWindow::sendMessage(QString botId, QString message)
 {
-    connection_.Send(botId + "|" + message);
+    if (connection_)
+        connection_->Send(botId + "|" + message);
 }
 
 void MainWindow::on_actionRefresh_triggered()
 {
-    connection_.GetBotNames();
+    if (connection_)
+        connection_->GetBotNames();
 }
 
 void MainWindow::on_actionExit_triggered()
 {
     QApplication::quit();
+}
+
+void MainWindow::on_actionConnect_triggered()
+{
+    ConnectionDialog dialog(this);
+    if (dialog.exec())
+    {
+        QString hostname = dialog.GetHostname();
+        uint16_t port = dialog.GetPort();
+
+        if (connection_)
+            delete connection_;
+
+        connection_ = new Connection(hostname, port);
+        connect(connection_, &Connection::dataReceived,
+            this, &MainWindow::dataReceived);
+        on_actionRefresh_triggered();
+    }
 }

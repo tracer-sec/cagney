@@ -1,10 +1,10 @@
 #include "connection.h"
 #include <QThread>
 
-Connection::Connection() :
+Connection::Connection(QString hostname, quint16 port) :
     QObject(nullptr)
 {
-    socket_.connectToHost("localhost", 9999);
+    socket_.connectToHost(hostname, port);
     connect(&socket_, &QTcpSocket::readyRead, this, &Connection::dataReady);
 }
 

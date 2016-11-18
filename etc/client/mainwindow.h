@@ -25,11 +25,12 @@ public slots:
 private slots:
     void on_actionRefresh_triggered();
     void on_actionExit_triggered();
+    void on_actionConnect_triggered();
 
 private:
     void UpdateBotList(QStringList botNames);
     Ui::MainWindow *ui;
-    Connection connection_;
+    Connection *connection_;
 };
 
 #endif // MAINWINDOW_H

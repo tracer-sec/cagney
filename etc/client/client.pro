@@ -15,14 +15,17 @@ TEMPLATE = app
 SOURCES += main.cpp\
         mainwindow.cpp \
     connection.cpp \
-    botwindow.cpp
+    botwindow.cpp \
+    connectiondialog.cpp
 
 HEADERS  += mainwindow.h \
     connection.h \
-    botwindow.h
+    botwindow.h \
+    connectiondialog.h
 
 FORMS    += mainwindow.ui \
-    botwindow.ui
+    botwindow.ui \
+    connectiondialog.ui
 
 unix {
     QMAKE_CXXFLAGS += -std=c++11

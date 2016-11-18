@@ -39,6 +39,7 @@
     <property name="title">
      <string>File</string>
     </property>
+    <addaction name="actionConnect"/>
     <addaction name="actionExit"/>
    </widget>
    <addaction name="menuFile"/>
@@ -64,6 +65,11 @@
    </property>
    <property name="toolTip">
     <string>Refresh bot list</string>
+   </property>
+  </action>
+  <action name="actionConnect">
+   <property name="text">
+    <string>Connect</string>
    </property>
   </action>
  </widget>

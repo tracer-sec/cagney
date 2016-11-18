@@ -8,7 +8,7 @@ class Connection : public QObject
     Q_OBJECT
 
 public:
-    Connection();
+    Connection(QString hostname, quint16 port);
 
     void GetBotNames();
     void Send(QString message);
