@@ -1,7 +1,7 @@
 #ifndef CONNECTION_H
 #define CONNECTION_H
 
-#include <QTcpSocket>
+#include <QSslSocket>
 
 class Connection : public QObject
 {
@@ -14,13 +14,16 @@ public:
     void Send(QString message);
 
 public slots:
+    void connectionMade();
     void dataReady();
+    void sslErrors(const QList<QSslError> &errors);
 
 signals:
     void dataReceived(QString line);
 
 private:
-    QTcpSocket socket_;
+    QSslSocket socket_;
+    bool connected_;
 };
 
 #endif // CONNECTION_H

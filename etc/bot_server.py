@@ -2,6 +2,7 @@ import socket
 import select
 import threading
 import time
+import ssl
 
 '''
 TODO
@@ -45,8 +46,13 @@ class BotServer(object):
         
     def on_bot_accept(self):
         bot_connection, bot_address = self.bot_socket.accept()
+        stream = ssl.wrap_socket(bot_connection, 
+                                 server_side=True,
+                                 certfile='cert.pem',
+                                 keyfile='key.pem',
+                                 ssl_version=ssl.PROTOCOL_TLSv1)
         print('Accepting bot from {0}'.format(bot_address))
-        b = Bot(bot_connection, self)
+        b = Bot(stream, self)
         self.bots.append(b)
         t = threading.Thread(target=b.loop)
         t.daemon = True
@@ -55,9 +61,14 @@ class BotServer(object):
         
     def on_client_accept(self):
         client_connection, client_address = self.client_socket.accept()
+        stream = ssl.wrap_socket(client_connection, 
+                                 server_side=True,
+                                 certfile='cert.pem',
+                                 keyfile='key.pem',
+                                 ssl_version=ssl.PROTOCOL_TLSv1)
         if self.client == None:
             print('Accepting client from {0}'.format(client_address))
-            c = Client(client_connection, self)
+            c = Client(stream, self)
             self.client = c
             t = threading.Thread(target=c.loop)
             t.daemon = True
@@ -108,6 +119,7 @@ class Bot(object):
         self.server = server
         
     def send(self, data):
+        print('{0} -> {1}'.format(self.bot_id, data))
         self.__socket.sendall(data + '\r\n')
            
     def recv(self, buffer_size=1024):
@@ -180,7 +192,7 @@ class Client(object):
         while self.__running:
             time.sleep(0.1)
             if not self.recv():
-                break;
+                break
         self.server.client_leaving()
         
 

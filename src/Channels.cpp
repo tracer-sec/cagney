@@ -7,14 +7,14 @@ using namespace Legit;
 using namespace std;
 
 IrcCommandChannel::IrcCommandChannel(string host, string port, string channel, string herder, string pem) :
+    client_(nullptr),
     channel_(channel),
-    herder_(herder),
-    client_(nullptr)
+    herder_(herder)
 {
     RandomGenerator rng;
     nick_ = rng.GetString(Legit::ALPHA_MIXED, 1) + rng.GetString(Legit::ALPHA_NUMERIC_MIXED, 15);
      
-    client_ = make_unique<IrcClient>(make_unique<SecureSocket>(host, port, make_unique<CertStore>(pem, false), 500), nick_);
+    client_ = make_unique<IrcClient>(make_unique<SecureSocket>(host, port, make_unique<CertStore>(pem, false)), nick_);
 
     while (!client_->ReceivedFirstPing())
     {
@@ -46,8 +46,7 @@ string IrcCommandChannel::Receive()
 }
 
 CustomCommandChannel::CustomCommandChannel(string host, string port, string pem) : 
-    //socket_(make_unique<SecureSocket>(host, port, make_unique<CertStore>(pem, false)))
-    socket_(make_unique<Socket>(host, port))
+    socket_(make_unique<SecureSocket>(host, port, make_unique<CertStore>(pem, false)))
 {
     RandomGenerator rng;
 
