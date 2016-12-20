@@ -30,6 +30,11 @@ void BotWindow::AddMessage(QString line)
     ui->textBuffer->scrollToBottom();
 }
 
+void BotWindow::GotFocus()
+{
+    ui->commandInput->setFocus();
+}
+
 void BotWindow::resizeEvent(QResizeEvent *event)
 {
     Q_UNUSED(event);

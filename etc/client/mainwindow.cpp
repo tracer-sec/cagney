@@ -3,8 +3,6 @@
 #include "botwindow.h"
 #include "connectiondialog.h"
 
-#include <QMdiSubWindow>
-
 using namespace std;
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -16,6 +14,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(ui->botList, &QListWidget::itemDoubleClicked,
         this, &MainWindow::botSelected);
+    connect(ui->messageWindowContainer, &QMdiArea::subWindowActivated,
+        this, &MainWindow::botWindowSelected);
 
     on_actionConnect_triggered();
 }
@@ -123,5 +123,17 @@ void MainWindow::on_actionConnect_triggered()
         connect(connection_, &Connection::dataReceived,
             this, &MainWindow::dataReceived);
         on_actionRefresh_triggered();
+    }
+}
+
+void MainWindow::botWindowSelected(QMdiSubWindow *window)
+{
+    for (auto childWindow : ui->messageWindowContainer->subWindowList())
+    {
+        if (childWindow == window)
+        {
+            auto w = reinterpret_cast<BotWindow *>(childWindow->widget());
+            w->GotFocus();
+        }
     }
 }

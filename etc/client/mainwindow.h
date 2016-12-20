@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QListWidgetItem>
+#include <QMdiSubWindow>
 #include "connection.h"
 
 namespace Ui {
@@ -21,6 +22,7 @@ public slots:
     void botSelected(QListWidgetItem *item);
     void dataReceived(QString line);
     void sendMessage(QString botId, QString message);
+    void botWindowSelected(QMdiSubWindow *window);
 
 private slots:
     void on_actionRefresh_triggered();

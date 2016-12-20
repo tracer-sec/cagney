@@ -18,6 +18,7 @@ public:
 
     QString GetBotId() { return botId_; }
     void AddMessage(QString line);
+    void GotFocus();
 
 protected:
     virtual void resizeEvent(QResizeEvent *event) override;
