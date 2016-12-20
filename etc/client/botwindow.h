@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QStringListModel>
+#include <vector>
 
 namespace Ui {
 class BotWindow;
@@ -22,6 +23,7 @@ public:
 
 protected:
     virtual void resizeEvent(QResizeEvent *event) override;
+    virtual bool eventFilter(QObject *watched, QEvent *event) override;
 
 signals:
     void sendCommand(QString botId, QString message);
@@ -33,6 +35,8 @@ private:
     Ui::BotWindow *ui;
     QString botId_;
     QStringListModel model_;
+    std::vector<QString> commandBuffer_;
+    int commandBufferIndex_;
 };
 
 #endif // BOTWINDOW_H
