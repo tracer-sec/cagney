@@ -2,6 +2,7 @@
 #include <QThread>
 #include <QSslConfiguration>
 #include <QSslCertificate>
+#include <QMessageBox>
 
 Connection::Connection(QObject *parent, QString hostname, quint16 port, QString certPath) :
     QObject(parent),
@@ -20,9 +21,12 @@ Connection::Connection(QObject *parent, QString hostname, quint16 port, QString 
     socket_.setSslConfiguration(config);
 
     // ignore hostname errors
-    QList<QSslError> expectedErrors;
-    expectedErrors << QSslError(QSslError::HostNameMismatch, certs[0]);
-    socket_.ignoreSslErrors(expectedErrors);
+    if (certs.length() > 0)
+    {
+        QList<QSslError> expectedErrors;
+        expectedErrors << QSslError(QSslError::HostNameMismatch, certs[0]);
+        socket_.ignoreSslErrors(expectedErrors);
+    }
 }
 
 void Connection::Connect()
@@ -67,9 +71,17 @@ void Connection::dataReady()
 
 void Connection::sslErrors(const QList<QSslError> &errors)
 {
+    QString allErrors;
     for (auto e : errors)
     {
-        auto message = e.errorString();
-        message = message;
+        allErrors += e.errorString();
+        if (e.error() == QSslError::HostNameMismatch)
+            allErrors += " (IGNORED)";
+        allErrors += "\n";
+    }
+
+    if (allErrors.length() > 0)
+    {
+        QMessageBox::warning(nullptr, "SSL Connection Errors", allErrors);
     }
 }
