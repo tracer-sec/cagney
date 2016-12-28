@@ -17,8 +17,12 @@ public:
 
     QString GetHostname();
     quint16 GetPort();
+    QString GetCertPath();
 
     void accept() override;
+
+private slots:
+    void browseCertButtonClicked();
 
 private:
     Ui::ConnectionDialog *ui;

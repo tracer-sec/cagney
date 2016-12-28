@@ -1,12 +1,16 @@
 #include "connectiondialog.h"
 #include "ui_connectiondialog.h"
 #include <QMessageBox>
+#include <QFileDialog>
 
 ConnectionDialog::ConnectionDialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::ConnectionDialog)
 {
     ui->setupUi(this);
+
+    connect(ui->browseCertButton, &QPushButton::clicked,
+            this, &ConnectionDialog::browseCertButtonClicked);
 }
 
 ConnectionDialog::~ConnectionDialog()
@@ -24,11 +28,18 @@ quint16 ConnectionDialog::GetPort()
     return ui->portEdit->text().toUShort();
 }
 
+QString ConnectionDialog::GetCertPath()
+{
+    return ui->certPathEdit->text();
+}
+
 void ConnectionDialog::accept()
 {
     bool validNumber;
     ui->portEdit->text().toUShort(&validNumber);
-    if (ui->hostEdit->text().length() > 0 && validNumber)
+    if (ui->hostEdit->text().length() > 0
+            && validNumber
+            && ui->certPathEdit->text().length() > 0)
         QDialog::accept();
     else
     {
@@ -37,4 +48,11 @@ void ConnectionDialog::accept()
         msg.setText("Please ensure that the connection details are valid");
         msg.exec();
     }
+}
+
+void ConnectionDialog::browseCertButtonClicked()
+{
+    auto filename = QFileDialog::getOpenFileName(this, "Select certificate file", "", "Certificate files (*.cer *.pem);; All files (* *.*)");
+    if (!filename.isNull())
+        ui->certPathEdit->setText(filename);
 }

@@ -115,14 +115,20 @@ void MainWindow::on_actionConnect_triggered()
     {
         QString hostname = dialog.GetHostname();
         uint16_t port = dialog.GetPort();
+        QString certPath = dialog.GetCertPath();
 
         if (connection_)
             delete connection_;
 
-        connection_ = new Connection(hostname, port);
+        connection_ = new Connection(hostname, port, certPath);
         connect(connection_, &Connection::dataReceived,
             this, &MainWindow::dataReceived);
         on_actionRefresh_triggered();
+    }
+    else
+    {
+        // TODO: yuck
+        exit(1);
     }
 }
 

@@ -8,7 +8,7 @@ class Connection : public QObject
     Q_OBJECT
 
 public:
-    Connection(QString hostname, quint16 port);
+    Connection(QString hostname, quint16 port, QString certPath);
 
     void GetBotNames();
     void Send(QString message);

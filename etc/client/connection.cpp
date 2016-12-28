@@ -3,7 +3,7 @@
 #include <QSslConfiguration>
 #include <QSslCertificate>
 
-Connection::Connection(QString hostname, quint16 port) :
+Connection::Connection(QString hostname, quint16 port, QString certPath) :
     QObject(nullptr),
     connected_(false)
 {
@@ -12,8 +12,7 @@ Connection::Connection(QString hostname, quint16 port) :
     connect(&socket_, SIGNAL(sslErrors(const QList<QSslError> &)), this, SLOT(sslErrors(const QList<QSslError> &)));
 
     // load and apply cert
-    // TODO: get details from connection dialog
-    QList<QSslCertificate> certs = QSslCertificate::fromPath("cert.pem");
+    QList<QSslCertificate> certs = QSslCertificate::fromPath(certPath);
     QSslConfiguration config;
     config.setCaCertificates(certs);
     socket_.setSslConfiguration(config);
