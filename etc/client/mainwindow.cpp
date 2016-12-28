@@ -12,6 +12,10 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    statusLabel_ = new QLabel(this);
+    statusLabel_->setText("DISCONNECTED");
+    ui->statusBar->addPermanentWidget(statusLabel_);
+
     connect(ui->botList, &QListWidget::itemDoubleClicked,
         this, &MainWindow::botSelected);
     connect(ui->messageWindowContainer, &QMdiArea::subWindowActivated,
@@ -120,15 +124,12 @@ void MainWindow::on_actionConnect_triggered()
         if (connection_)
             delete connection_;
 
-        connection_ = new Connection(hostname, port, certPath);
+        connection_ = new Connection(this, hostname, port, certPath);
+        connect(connection_, &Connection::connectionCompleted,
+            this, &MainWindow::connectionCompleted);
         connect(connection_, &Connection::dataReceived,
             this, &MainWindow::dataReceived);
-        on_actionRefresh_triggered();
-    }
-    else
-    {
-        // TODO: yuck
-        exit(1);
+        connection_->Connect();
     }
 }
 
@@ -142,4 +143,10 @@ void MainWindow::botWindowSelected(QMdiSubWindow *window)
             w->GotFocus();
         }
     }
+}
+
+void MainWindow::connectionCompleted()
+{
+    statusLabel_->setText("CONNECTED");
+    on_actionRefresh_triggered();
 }

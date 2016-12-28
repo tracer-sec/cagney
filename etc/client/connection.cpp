@@ -3,8 +3,10 @@
 #include <QSslConfiguration>
 #include <QSslCertificate>
 
-Connection::Connection(QString hostname, quint16 port, QString certPath) :
-    QObject(nullptr),
+Connection::Connection(QObject *parent, QString hostname, quint16 port, QString certPath) :
+    QObject(parent),
+    hostname_(hostname),
+    port_(port),
     connected_(false)
 {
     connect(&socket_, &QSslSocket::encrypted, this, &Connection::connectionMade);
@@ -21,8 +23,11 @@ Connection::Connection(QString hostname, quint16 port, QString certPath) :
     QList<QSslError> expectedErrors;
     expectedErrors << QSslError(QSslError::HostNameMismatch, certs[0]);
     socket_.ignoreSslErrors(expectedErrors);
+}
 
-    socket_.connectToHostEncrypted(hostname, port);
+void Connection::Connect()
+{
+    socket_.connectToHostEncrypted(hostname_, port_);
 }
 
 void Connection::GetBotNames()
@@ -47,6 +52,7 @@ void Connection::Send(QString message)
 void Connection::connectionMade()
 {
     connected_ = true;
+    emit connectionCompleted();
 }
 
 void Connection::dataReady()

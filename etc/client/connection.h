@@ -8,8 +8,9 @@ class Connection : public QObject
     Q_OBJECT
 
 public:
-    Connection(QString hostname, quint16 port, QString certPath);
+    Connection(QObject *parent, QString hostname, quint16 port, QString certPath);
 
+    void Connect();
     void GetBotNames();
     void Send(QString message);
 
@@ -20,9 +21,12 @@ public slots:
 
 signals:
     void dataReceived(QString line);
+    void connectionCompleted();
 
 private:
     QSslSocket socket_;
+    QString hostname_;
+    quint16 port_;
     bool connected_;
 };
 
