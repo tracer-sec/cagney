@@ -50,7 +50,7 @@ class BotServer(object):
                                  server_side=True,
                                  certfile='cert.pem',
                                  keyfile='key.pem',
-                                 ssl_version=ssl.PROTOCOL_TLSv1)
+                                 ssl_version=ssl.PROTOCOL_TLSv1_2)
         print('Accepting bot from {0}'.format(bot_address))
         b = Bot(stream, self)
         self.bots.append(b)
@@ -65,7 +65,7 @@ class BotServer(object):
                                  server_side=True,
                                  certfile='cert.pem',
                                  keyfile='key.pem',
-                                 ssl_version=ssl.PROTOCOL_TLSv1)
+                                 ssl_version=ssl.PROTOCOL_TLSv1_2)
         if self.client == None:
             print('Accepting client from {0}'.format(client_address))
             c = Client(stream, self)

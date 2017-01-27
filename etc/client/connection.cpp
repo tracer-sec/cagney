@@ -18,6 +18,7 @@ Connection::Connection(QObject *parent, QString hostname, quint16 port, QString 
     QList<QSslCertificate> certs = QSslCertificate::fromPath(certPath);
     QSslConfiguration config;
     config.setCaCertificates(certs);
+    config.setProtocol(QSsl::TlsV1_2);
     socket_.setSslConfiguration(config);
 
     // ignore hostname errors
