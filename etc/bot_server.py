@@ -120,14 +120,14 @@ class Bot(object):
         
     def send(self, data):
         print('{0} -> {1}'.format(self.bot_id, data))
-        self.__socket.sendall(data + '\r\n')
+        self.__socket.sendall((data + '\r\n').encode('utf-8'))
            
     def recv(self, buffer_size=1024):
         while '\r\n' not in self.__buffer:
             data = self.__socket.recv(buffer_size)
             if len(data) == 0:
                 return False
-            self.__buffer = self.__buffer + data
+            self.__buffer = self.__buffer + data.decode('utf-8')
         
         while '\r\n' in self.__buffer:
             i = self.__buffer.find('\r\n')
@@ -169,14 +169,14 @@ class Client(object):
         
     def send(self, data):
         print('CLIENT < {0}'.format(data))
-        self.__socket.sendall(data + '\r\n')
+        self.__socket.sendall((data + '\r\n').encode('utf-8'))
         
     def recv(self, buffer_size=1024):
         while '\r\n' not in self.__buffer:
             data = self.__socket.recv(buffer_size)
             if len(data) == 0:
                 return False
-            self.__buffer = self.__buffer + data
+            self.__buffer = self.__buffer + data.decode('utf-8')
         
         while '\r\n' in self.__buffer:
             i = self.__buffer.find('\r\n')
