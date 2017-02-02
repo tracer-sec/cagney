@@ -13,9 +13,9 @@ BIN=$(BINDIR)/cagney
 
 all: setup $(BIN)
 
-$(BIN): $(OBJECTS) ; $(CC) $(LDFLAGS) $(OBJECTS) -o $@ -L../Legit/bin -L../../lib/Botan-2.0.1 -llegit -lbotan-2 -lpthread
+$(BIN): $(OBJECTS) ; $(CC) $(LDFLAGS) $(OBJECTS) -o $@ -L../legit/bin -L../../lib/Botan-2.0.1 -llegit -lbotan-2 -lpthread
 
-$(OBJDIR)/%.o: $(SRCDIR)/%.cpp ; $(CC) $(CFLAGS) -o $@ $< -I../Legit/Legit -I../../lib/Botan-2.0.1/build/include
+$(OBJDIR)/%.o: $(SRCDIR)/%.cpp ; $(CC) $(CFLAGS) -o $@ $< -I../legit/Legit -I../../lib/Botan-2.0.1/build/include
 
 clean: ; rm -f $(BINDIR)/* $(OBJDIR)/*
 

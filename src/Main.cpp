@@ -3,7 +3,7 @@
 #include "Utils.hpp"
 #include "SystemInfo.hpp"
 #include "DataLoader.hpp"
-#include "Lib/json.hpp"
+#include "lib/json.hpp"
 #include "HttpClient.hpp"
 #include "HttpUtils.hpp"
 #include "Processes.hpp"
