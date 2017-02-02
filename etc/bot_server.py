@@ -197,6 +197,6 @@ class Client(object):
         
 
 if __name__ == '__main__':
-    server = BotServer('localhost', 8888, 9999)
+    server = BotServer('', 8888, 9999)
     server.start()
     
