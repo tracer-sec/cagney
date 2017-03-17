@@ -3,6 +3,7 @@ import select
 import threading
 import time
 import ssl
+from datetime import datetime
 
 '''
 TODO
@@ -95,12 +96,24 @@ class BotServer(object):
         if message == 'bot_list':
             full_list = ';'.join(map(lambda x: x.bot_id, self.bots))
             self.client.send('[bot_list]|' + full_list)
+        elif message.startswith('info_'):
+            bot_id = message.split('_')[1]
+            bot_list = [x for x in self.bots if x.bot_id == bot_id]
+            if len(bot_list) > 0:
+                bot_data = bot_list[0].get_info()
+                self.client.send(message + '|' + ';'.join(bot_data))
         else:
             self.client.send('[-]|unknown command: ' + message)
+
+    def bot_joined(self, bot):
+        print('Bot registered: {0}'.format(bot.bot_id))
+        self.client.send('[bot_joined]|' + bot.bot_id)
+        
 
     def bot_leaving(self, bot):
         self.bots.remove(bot)
         print('Bot leaving: ' + bot.bot_id)
+        self.client.send('[bot_left]|' + bot.bot_id)
         # what about thread?
         
     def client_leaving(self):
@@ -116,6 +129,7 @@ class Bot(object):
 
         self.handshake_completed = False
         self.bot_id = None
+        self.registered_time = None
         self.server = server
         
     def send(self, data):
@@ -144,8 +158,9 @@ class Bot(object):
                 else:
                     self.handshake_completed = True
                     self.bot_id = line
+                    self.registered_time = datetime.utcnow()
                     self.send('OK')
-                    print('Bot registered: {0}'.format(self.bot_id))
+                    self.server.bot_joined(self)
 
         return True
 
@@ -158,6 +173,13 @@ class Bot(object):
                 break;
         self.__running = False
         self.server.bot_leaving(self)
+
+    def get_info(self):
+        result = [
+            'addr: ' + str(self.__socket.getpeername()),
+            'reg: ' + str(self.registered_time)
+        ]
+        return result
 
         
 class Client(object):

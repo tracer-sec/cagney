@@ -36,6 +36,20 @@ void MainWindow::UpdateBotList(QStringList botNames)
     ui->botList->addItems(botNames);
 }
 
+void MainWindow::AddToBotList(QString botName)
+{
+    ui->botList->addItem(botName);
+}
+
+void MainWindow::RemoveFromBotList(QString botName)
+{
+    // Really, Qt?
+    auto items = ui->botList->findItems(botName, Qt::MatchFixedString);
+    auto index = ui->botList->row(items[0]);
+    auto item = ui->botList->takeItem(index);
+    delete item;
+}
+
 void MainWindow::botSelected(QListWidgetItem *item)
 {
     QString botId = item->text();
@@ -74,8 +88,19 @@ void MainWindow::dataReceived(QString line)
 
     if (botId == "[bot_list]")
     {
-        QStringList botNames = message.split(';');
-        UpdateBotList(botNames);
+        if (message.length() > 0)
+        {
+            QStringList botNames = message.split(';');
+            UpdateBotList(botNames);
+        }
+    }
+    else if (botId == "[bot_joined]")
+    {
+        AddToBotList(message);
+    }
+    else if (botId == "[bot_left]")
+    {
+        RemoveFromBotList(message);
     }
     else
     {
@@ -123,6 +148,8 @@ void MainWindow::on_actionConnect_triggered()
 
         if (connection_)
             delete connection_;
+
+        statusLabel_->setText("DISCONNECTED");
 
         connection_ = new Connection(this, hostname, port, certPath);
         connect(connection_, &Connection::connectionCompleted,

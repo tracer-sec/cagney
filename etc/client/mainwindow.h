@@ -33,6 +33,8 @@ private slots:
 
 private:
     void UpdateBotList(QStringList botNames);
+    void AddToBotList(QString botName);
+    void RemoveFromBotList(QString botName);
     Ui::MainWindow *ui;
     Connection *connection_;
     QLabel *statusLabel_;
