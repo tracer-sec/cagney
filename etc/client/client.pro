@@ -30,3 +30,6 @@ FORMS    += mainwindow.ui \
 unix {
     QMAKE_CXXFLAGS += -std=c++11
 }
+win32 {
+    LIBS += -LC:\OpenSSL-Win32\lib -llibssl -llibcrypto
+}
