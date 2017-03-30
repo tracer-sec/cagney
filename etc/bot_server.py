@@ -107,13 +107,15 @@ class BotServer(object):
 
     def bot_joined(self, bot):
         print('Bot registered: {0}'.format(bot.bot_id))
-        self.client.send('[bot_joined]|' + bot.bot_id)
+        if self.client != None:
+            self.client.send('[bot_joined]|' + bot.bot_id)
         
 
     def bot_leaving(self, bot):
         self.bots.remove(bot)
         print('Bot leaving: ' + bot.bot_id)
-        self.client.send('[bot_left]|' + bot.bot_id)
+        if self.client != None:
+            self.client.send('[bot_left]|' + bot.bot_id)
         # what about thread?
         
     def client_leaving(self):
@@ -138,7 +140,10 @@ class Bot(object):
            
     def recv(self, buffer_size=1024):
         while '\r\n' not in self.__buffer:
-            data = self.__socket.recv(buffer_size)
+            try:
+                data = self.__socket.recv(buffer_size)
+            except ConnectionError:
+                return False
             if len(data) == 0:
                 return False
             self.__buffer = self.__buffer + data.decode('utf-8')
