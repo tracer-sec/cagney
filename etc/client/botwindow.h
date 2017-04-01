@@ -18,7 +18,9 @@ public:
     ~BotWindow();
 
     QString GetBotId() { return botId_; }
-    void AddMessage(QString line);
+    void AddBotMessage(QString line);
+    void AddClientMessage(QString line);
+    void AddSystemMessage(QString line);
     void GotFocus();
 
 protected:
@@ -34,7 +36,6 @@ public slots:
 private:
     Ui::BotWindow *ui;
     QString botId_;
-    QStringListModel model_;
     std::vector<QString> commandBuffer_;
     int commandBufferIndex_;
 };

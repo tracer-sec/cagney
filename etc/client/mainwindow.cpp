@@ -1,6 +1,5 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "botwindow.h"
 #include "connectiondialog.h"
 
 using namespace std;
@@ -50,21 +49,25 @@ void MainWindow::RemoveFromBotList(QString botName)
     delete item;
 }
 
-void MainWindow::botSelected(QListWidgetItem *item)
+BotWindow *MainWindow::GetWindowByBotId(QString botId)
 {
-    QString botId = item->text();
-    BotWindow *botWindow = nullptr;
-    QMdiSubWindow *s = nullptr;
     for (auto childWindow : ui->messageWindowContainer->subWindowList())
     {
         auto w = reinterpret_cast<BotWindow *>(childWindow->widget());
         if (w->GetBotId() == botId)
         {
-            botWindow = w;
-            s = childWindow;
-            break;
+            return w;
         }
     }
+
+    return nullptr;
+}
+
+void MainWindow::botSelected(QListWidgetItem *item)
+{
+    QString botId = item->text();
+    BotWindow *botWindow = GetWindowByBotId(botId);
+    QMdiSubWindow *s = reinterpret_cast<QMdiSubWindow *>(botWindow);
 
     if (botWindow == nullptr)
     {
@@ -100,23 +103,16 @@ void MainWindow::dataReceived(QString line)
     }
     else if (botId == "[bot_left]")
     {
+        BotWindow *botWindow = GetWindowByBotId(message);
+        if (botWindow != nullptr)
+            botWindow->AddSystemMessage("Bot left");
         RemoveFromBotList(message);
     }
     else
     {
-        BotWindow *botWindow = nullptr;
-        for (auto childWindow : ui->messageWindowContainer->subWindowList())
-        {
-            auto w = reinterpret_cast<BotWindow *>(childWindow->widget());
-            if (w->GetBotId() == botId)
-            {
-                botWindow = w;
-                break;
-            }
-        }
-
+        BotWindow *botWindow = GetWindowByBotId(botId);
         if (botWindow != nullptr)
-            botWindow->AddMessage("< " + message);
+            botWindow->AddBotMessage(message);
     }
 }
 

@@ -6,6 +6,7 @@
 #include <QMdiSubWindow>
 #include <QLabel>
 #include "connection.h"
+#include "botwindow.h"
 
 namespace Ui {
 class MainWindow;
@@ -35,6 +36,7 @@ private:
     void UpdateBotList(QStringList botNames);
     void AddToBotList(QString botName);
     void RemoveFromBotList(QString botName);
+    BotWindow *GetWindowByBotId(QString botId);
     Ui::MainWindow *ui;
     Connection *connection_;
     QLabel *statusLabel_;

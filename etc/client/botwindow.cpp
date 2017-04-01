@@ -1,17 +1,16 @@
 #include "botwindow.h"
 #include "ui_botwindow.h"
 #include <QKeyEvent>
+#include <QScrollBar>
 
 BotWindow::BotWindow(QString botId, QWidget *parent) :
-    botId_(botId),
-    commandBufferIndex_(-1),
     QWidget(parent),
-    ui(new Ui::BotWindow)
+    ui(new Ui::BotWindow),
+    botId_(botId),
+    commandBufferIndex_(-1)
 {
     ui->setupUi(this);
     setWindowTitle(botId);
-
-    ui->textBuffer->setModel(&model_);
 
     ui->commandInput->installEventFilter(this);
     ui->commandInput->setFocus();
@@ -25,12 +24,24 @@ BotWindow::~BotWindow()
     delete ui;
 }
 
-void BotWindow::AddMessage(QString line)
+void BotWindow::AddBotMessage(QString line)
 {
-    model_.insertRow(model_.rowCount());
-    QModelIndex index = model_.index(model_.rowCount() - 1);
-    model_.setData(index, line);
-    ui->textBuffer->scrollToBottom();
+    ui->textBuffer->append("< " + line);
+}
+
+void BotWindow::AddClientMessage(QString line)
+{
+    ui->textBuffer->setFontItalic(true);
+    ui->textBuffer->append("> " + line);
+    ui->textBuffer->setFontItalic(false);
+}
+
+void BotWindow::AddSystemMessage(QString line)
+{
+    int oldFontWeight = ui->textBuffer->fontWeight();
+    ui->textBuffer->setFontWeight(oldFontWeight * 2);
+    ui->textBuffer->append("* " + line);
+    ui->textBuffer->setFontWeight(oldFontWeight);
 }
 
 void BotWindow::GotFocus()
@@ -41,7 +52,8 @@ void BotWindow::GotFocus()
 void BotWindow::resizeEvent(QResizeEvent *event)
 {
     Q_UNUSED(event);
-    ui->textBuffer->scrollToBottom();
+    //ui->textBuffer->scrollToBottom();
+    ui->textBuffer->verticalScrollBar()->setValue(ui->textBuffer->verticalScrollBar()->maximum());
 }
 
 bool BotWindow::eventFilter(QObject *watched, QEvent *event)
@@ -91,7 +103,7 @@ bool BotWindow::eventFilter(QObject *watched, QEvent *event)
 void BotWindow::commandEntered()
 {
     QString line(ui->commandInput->text());
-    AddMessage("> " + line);
+    AddClientMessage(line);
     emit sendCommand(botId_, line);
     ui->commandInput->clear();
     commandBuffer_.push_back(line);
