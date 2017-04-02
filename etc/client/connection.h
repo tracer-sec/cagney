@@ -8,7 +8,7 @@ class Connection : public QObject
     Q_OBJECT
 
 public:
-    Connection(QObject *parent, QString hostname, quint16 port, QString certPath);
+    Connection(QObject *parent, QString hostname, quint16 port, QString password, QString certPath);
 
     void Connect();
     void GetBotNames();
@@ -27,6 +27,7 @@ private:
     QSslSocket socket_;
     QString hostname_;
     quint16 port_;
+    QString password_;
     bool connected_;
 };
 

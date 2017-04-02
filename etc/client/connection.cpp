@@ -4,10 +4,11 @@
 #include <QSslCertificate>
 #include <QMessageBox>
 
-Connection::Connection(QObject *parent, QString hostname, quint16 port, QString certPath) :
+Connection::Connection(QObject *parent, QString hostname, quint16 port, QString password, QString certPath) :
     QObject(parent),
     hostname_(hostname),
     port_(port),
+    password_(password),
     connected_(false)
 {
     connect(&socket_, &QSslSocket::encrypted, this, &Connection::connectionMade);
@@ -56,8 +57,9 @@ void Connection::Send(QString message)
 
 void Connection::connectionMade()
 {
-    connected_ = true;
-    emit connectionCompleted();
+    QString fullMessage = password_ + "\r\n";
+    socket_.write(fullMessage.toStdString().c_str());
+    socket_.waitForBytesWritten();
 }
 
 void Connection::dataReady()
@@ -66,7 +68,22 @@ void Connection::dataReady()
     {
         auto data = socket_.readLine();
         QString line = QString::fromLatin1(data).trimmed();
-        emit dataReceived(line);
+        if (connected_)
+        {
+            emit dataReceived(line);
+        }
+        else
+        {
+            if (line == "OK")
+            {
+                connected_ = true;
+                emit connectionCompleted();
+            }
+            else if (line == "AUTH_FAILED")
+            {
+                QMessageBox::warning(nullptr, "Connection Errors", "Authentication failed");
+            }
+        }
     }
 }
 

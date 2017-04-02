@@ -28,6 +28,11 @@ quint16 ConnectionDialog::GetPort()
     return ui->portEdit->text().toUShort();
 }
 
+QString ConnectionDialog::GetPassword()
+{
+    return ui->passwordEdit->text();
+}
+
 QString ConnectionDialog::GetCertPath()
 {
     return ui->certPathEdit->text();

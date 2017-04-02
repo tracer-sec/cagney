@@ -11,6 +11,8 @@ TODO
 - graceful closing
 '''
 
+PASSWORD = 'PASSWORD_LOL'
+
 class Message(object):
     def __init__(self, message):
         parts = message.split('|', 1)
@@ -193,6 +195,7 @@ class Client(object):
         self.__buffer = ''
         self.__running = False
         self.server = server
+        self.handshake_completed = False
         
     def send(self, data):
         print('CLIENT < {0}'.format(data))
@@ -209,8 +212,17 @@ class Client(object):
             i = self.__buffer.find('\r\n')
             line = self.__buffer[:i]
             self.__buffer = self.__buffer[i + 2:]
-            print('CLIENT > {0}'.format(line))
-            self.server.on_client_message(line)
+            if self.handshake_completed:
+                print('CLIENT > {0}'.format(line))
+                self.server.on_client_message(line)
+            else:
+                if line == PASSWORD:
+                    self.handshake_completed = True
+                    print('CLIENT auth completed')
+                    self.send('OK')
+                else:
+                    print('CLIENT auth failed')
+                    self.send('AUTH_FAILED')
             
         return True
         

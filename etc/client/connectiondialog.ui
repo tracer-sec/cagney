@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>343</width>
-    <height>143</height>
+    <height>167</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -35,17 +35,17 @@
       <property name="bottomMargin">
        <number>0</number>
       </property>
-      <item row="0" column="0">
-       <widget class="QLabel" name="label">
-        <property name="text">
-         <string>Host</string>
-        </property>
-       </widget>
-      </item>
       <item row="1" column="0" colspan="2">
        <widget class="QLabel" name="label_2">
         <property name="text">
          <string>Port</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Host</string>
         </property>
        </widget>
       </item>
@@ -59,14 +59,14 @@
       <item row="0" column="3">
        <widget class="QLineEdit" name="hostEdit"/>
       </item>
-      <item row="2" column="0">
+      <item row="3" column="0">
        <widget class="QLabel" name="label_3">
         <property name="text">
          <string>Certificate</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="3">
+      <item row="3" column="3">
        <widget class="QWidget" name="widget_2" native="true">
         <layout class="QHBoxLayout" name="horizontalLayout">
          <property name="spacing">
@@ -104,6 +104,20 @@
         </layout>
        </widget>
       </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_4">
+        <property name="text">
+         <string>Password</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="3">
+       <widget class="QLineEdit" name="passwordEdit">
+        <property name="echoMode">
+         <enum>QLineEdit::Password</enum>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>
@@ -128,6 +142,9 @@
  <tabstops>
   <tabstop>hostEdit</tabstop>
   <tabstop>portEdit</tabstop>
+  <tabstop>passwordEdit</tabstop>
+  <tabstop>certPathEdit</tabstop>
+  <tabstop>browseCertButton</tabstop>
  </tabstops>
  <resources/>
  <connections>

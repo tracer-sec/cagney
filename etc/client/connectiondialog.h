@@ -17,6 +17,7 @@ public:
 
     QString GetHostname();
     quint16 GetPort();
+    QString GetPassword();
     QString GetCertPath();
 
     void accept() override;

@@ -140,6 +140,7 @@ void MainWindow::on_actionConnect_triggered()
     {
         QString hostname = dialog.GetHostname();
         uint16_t port = dialog.GetPort();
+        QString password = dialog.GetPassword();
         QString certPath = dialog.GetCertPath();
 
         if (connection_)
@@ -147,7 +148,7 @@ void MainWindow::on_actionConnect_triggered()
 
         statusLabel_->setText("DISCONNECTED");
 
-        connection_ = new Connection(this, hostname, port, certPath);
+        connection_ = new Connection(this, hostname, port, password, certPath);
         connect(connection_, &Connection::connectionCompleted,
             this, &MainWindow::connectionCompleted);
         connect(connection_, &Connection::dataReceived,
