@@ -1,15 +1,14 @@
-import BaseHTTPServer
-import SocketServer
+from http.server import BaseHTTPRequestHandler, HTTPServer
 import cgi
-import urlparse
+import urllib.parse
 from datetime import datetime
 
-class CustomHandler(BaseHTTPServer.BaseHTTPRequestHandler):
+class CustomHandler(BaseHTTPRequestHandler):
     def do_POST(self):
         content_length = int(self.headers['Content-Length'])
 
-        u = urlparse.urlparse(self.path)
-        qs = urlparse.parse_qs(u.query)
+        u = urllib.parse.urlparse(self.path)
+        qs = urllib.parse.parse_qs(u.query)
         client_id = qs['c'][0]
 
         print('client_id: {0}'.format(client_id))
@@ -35,8 +34,9 @@ class CustomHandler(BaseHTTPServer.BaseHTTPRequestHandler):
                 total_uploaded = total_uploaded + len(file_contents)
 
         self.send_response(200, str(total_uploaded))
+        self.end_headers()
 
 if __name__ == '__main__':
-    httpd = SocketServer.TCPServer(('', 8080), CustomHandler)
+    httpd = HTTPServer(('', 8080), CustomHandler)
     httpd.serve_forever()
 
