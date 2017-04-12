@@ -49,6 +49,11 @@ void BotWindow::GotFocus()
     ui->commandInput->setFocus();
 }
 
+void BotWindow::Disable()
+{
+    ui->commandInput->setEnabled(false);
+}
+
 void BotWindow::resizeEvent(QResizeEvent *event)
 {
     Q_UNUSED(event);

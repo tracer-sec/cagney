@@ -105,7 +105,10 @@ void MainWindow::dataReceived(QString line)
     {
         BotWindow *botWindow = GetWindowByBotId(message);
         if (botWindow != nullptr)
+        {
             botWindow->AddSystemMessage("Bot left");
+            botWindow->Disable();
+        }
         RemoveFromBotList(message);
     }
     else

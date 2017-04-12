@@ -22,6 +22,7 @@ public:
     void AddClientMessage(QString line);
     void AddSystemMessage(QString line);
     void GotFocus();
+    void Disable();
 
 protected:
     virtual void resizeEvent(QResizeEvent *event) override;
