@@ -68,7 +68,7 @@ bool BotWindow::eventFilter(QObject *watched, QEvent *event)
         if (event->type() == QEvent::KeyPress)
         {
             QKeyEvent* keyEvent = reinterpret_cast<QKeyEvent *>(event);
-            if (keyEvent->key() == Qt::Key_Up)
+            if (keyEvent->key() == Qt::Key_Up && commandBuffer_.size() > 0)
             {
                  if (commandBufferIndex_ == -1)
                      commandBufferIndex_ = commandBuffer_.size() - 1;
@@ -79,7 +79,7 @@ bool BotWindow::eventFilter(QObject *watched, QEvent *event)
                  ui->commandInput->setText(commandBuffer_[commandBufferIndex_]);
                  return true;
             }
-            else if (keyEvent->key() == Qt::Key_Down)
+            else if (keyEvent->key() == Qt::Key_Down && commandBuffer_.size() > 0)
             {
                 if (commandBufferIndex_ != -1)
                     commandBufferIndex_ ++;
