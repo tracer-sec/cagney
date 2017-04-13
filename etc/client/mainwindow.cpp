@@ -1,6 +1,9 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "connectiondialog.h"
+#include "botinfodialog.h"
+#include <QJsonDocument>
+#include <QJsonObject>
 
 using namespace std;
 
@@ -17,6 +20,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(ui->botList, &QListWidget::itemDoubleClicked,
         this, &MainWindow::botSelected);
+    connect(ui->botList, &QListWidget::customContextMenuRequested,
+        this, &MainWindow::botContextMenuRequested);
     connect(ui->messageWindowContainer, &QMdiArea::subWindowActivated,
         this, &MainWindow::botWindowSelected);
 
@@ -83,6 +88,22 @@ void MainWindow::botSelected(QListWidgetItem *item)
     ui->messageWindowContainer->setActiveSubWindow(s);
 }
 
+void MainWindow::botContextMenuRequested(const QPoint &pos)
+{
+    QPoint globalPos = ui->botList->mapToGlobal(pos);
+
+    QMenu menu;
+    menu.addAction("Properties", this, &MainWindow::botInfoRequested);
+    menu.exec(globalPos);
+}
+
+void MainWindow::botInfoRequested()
+{
+    QListWidgetItem *item = ui->botList->selectedItems()[0];
+    QString botId = item->text();
+    connection_->Send("info_" + botId);
+}
+
 void MainWindow::dataReceived(QString line)
 {
     int splitIndex = line.indexOf('|');
@@ -110,6 +131,19 @@ void MainWindow::dataReceived(QString line)
             botWindow->Disable();
         }
         RemoveFromBotList(message);
+    }
+    else if (botId.startsWith("info_"))
+    {
+        botId = botId.mid(5);
+        QJsonDocument data = QJsonDocument::fromJson(message.toUtf8());
+        QJsonObject root = data.object();
+
+        BotInfo botInfo;
+        botInfo.botName = botId;
+        botInfo.hostAddress = root["addr"].toString();
+        botInfo.timeRegistered = root["reg"].toString();
+        BotInfoDialog dialog(botInfo, this);
+        dialog.exec();
     }
     else
     {

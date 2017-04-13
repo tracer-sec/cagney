@@ -32,6 +32,9 @@ private slots:
     void on_actionExit_triggered();
     void on_actionConnect_triggered();
 
+    void botContextMenuRequested(const QPoint &pos);
+    void botInfoRequested();
+
 private:
     void UpdateBotList(QStringList botNames);
     void AddToBotList(QString botName);

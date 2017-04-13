@@ -16,16 +16,19 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     connection.cpp \
     botwindow.cpp \
-    connectiondialog.cpp
+    connectiondialog.cpp \
+    botinfodialog.cpp
 
 HEADERS  += mainwindow.h \
     connection.h \
     botwindow.h \
-    connectiondialog.h
+    connectiondialog.h \
+    botinfodialog.h
 
 FORMS    += mainwindow.ui \
     botwindow.ui \
-    connectiondialog.ui
+    connectiondialog.ui \
+    botinfodialog.ui
 
 unix {
     QMAKE_CXXFLAGS += -std=c++11
