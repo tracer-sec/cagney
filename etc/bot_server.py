@@ -4,6 +4,7 @@ import threading
 import time
 import ssl
 from datetime import datetime
+import json
 
 '''
 TODO
@@ -103,7 +104,7 @@ class BotServer(object):
             bot_list = [x for x in self.bots if x.bot_id == bot_id]
             if len(bot_list) > 0:
                 bot_data = bot_list[0].get_info()
-                self.client.send(message + '|' + ';'.join(bot_data))
+                self.client.send(message + '|' + json.dumps(bot_data))
         else:
             self.client.send('[-]|unknown command: ' + message)
 
@@ -182,11 +183,10 @@ class Bot(object):
         self.server.bot_leaving(self)
 
     def get_info(self):
-        result = [
-            'addr: ' + str(self.__socket.getpeername()),
-            'reg: ' + str(self.registered_time)
-        ]
-        return result
+        return {
+            'addr': str(self.__socket.getpeername()),
+            'reg': str(self.registered_time)
+        }
 
         
 class Client(object):
