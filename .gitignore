@@ -7,3 +7,8 @@ build
 *.vcxproj.user
 etc/config.json
 etc/cc.cer
+etc/cert.pem
+etc/key.pem
+etc/build-*
+*.pro.user
+
