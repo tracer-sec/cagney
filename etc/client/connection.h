@@ -21,7 +21,7 @@ public slots:
 
 signals:
     void dataReceived(QString line);
-    void connectionCompleted();
+    void connectionCompleted(QString hostname);
 
 private:
     QSslSocket socket_;

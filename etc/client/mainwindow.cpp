@@ -184,6 +184,7 @@ void MainWindow::on_actionConnect_triggered()
         if (connection_)
             delete connection_;
 
+        setWindowTitle("Cagney");
         statusLabel_->setText("DISCONNECTED");
 
         connection_ = new Connection(this, hostname, port, password, certPath);
@@ -207,8 +208,9 @@ void MainWindow::botWindowSelected(QMdiSubWindow *window)
     }
 }
 
-void MainWindow::connectionCompleted()
+void MainWindow::connectionCompleted(QString hostname)
 {
+    setWindowTitle("Cagney - " + hostname);
     statusLabel_->setText("CONNECTED");
     on_actionRefresh_triggered();
 }

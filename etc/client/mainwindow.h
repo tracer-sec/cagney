@@ -25,7 +25,7 @@ public slots:
     void dataReceived(QString line);
     void sendMessage(QString botId, QString message);
     void botWindowSelected(QMdiSubWindow *window);
-    void connectionCompleted();
+    void connectionCompleted(QString hostname);
 
 private slots:
     void on_actionRefresh_triggered();

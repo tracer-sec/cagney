@@ -77,7 +77,7 @@ void Connection::dataReady()
             if (line == "OK")
             {
                 connected_ = true;
-                emit connectionCompleted();
+                emit connectionCompleted(hostname_);
             }
             else if (line == "AUTH_FAILED")
             {
