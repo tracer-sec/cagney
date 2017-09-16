@@ -72,19 +72,20 @@ void MainWindow::botSelected(QListWidgetItem *item)
 {
     QString botId = item->text();
     BotWindow *botWindow = GetWindowByBotId(botId);
-    QMdiSubWindow *s = reinterpret_cast<QMdiSubWindow *>(botWindow);
 
     if (botWindow == nullptr)
     {
         auto subWindow = new QMdiSubWindow(this);
         botWindow = new BotWindow(botId);
         subWindow->setWidget(botWindow);
-        s = ui->messageWindowContainer->addSubWindow(subWindow);
+        ui->messageWindowContainer->addSubWindow(subWindow);
         connect(botWindow, &BotWindow::sendCommand,
                 this, &MainWindow::sendMessage);
     }
 
     botWindow->show();
+
+    QMdiSubWindow *s = reinterpret_cast<QMdiSubWindow *>(botWindow->parent());
     ui->messageWindowContainer->setActiveSubWindow(s);
 }
 
