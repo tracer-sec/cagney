@@ -184,6 +184,8 @@ void MainWindow::on_actionConnect_triggered()
         if (connection_)
             delete connection_;
 
+        ui->botList->clear();
+
         setWindowTitle("Cagney");
         statusLabel_->setText("DISCONNECTED");
 
