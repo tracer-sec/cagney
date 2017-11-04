@@ -28,6 +28,9 @@ protected:
     virtual void resizeEvent(QResizeEvent *event) override;
     virtual bool eventFilter(QObject *watched, QEvent *event) override;
 
+private:
+    void ScrollToEnd();
+
 signals:
     void sendCommand(QString botId, QString message);
 

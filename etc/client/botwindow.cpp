@@ -27,6 +27,7 @@ BotWindow::~BotWindow()
 void BotWindow::AddBotMessage(QString line)
 {
     ui->textBuffer->append("< " + line);
+    ScrollToEnd();
 }
 
 void BotWindow::AddClientMessage(QString line)
@@ -34,6 +35,7 @@ void BotWindow::AddClientMessage(QString line)
     ui->textBuffer->setFontItalic(true);
     ui->textBuffer->append("> " + line);
     ui->textBuffer->setFontItalic(false);
+    ScrollToEnd();
 }
 
 void BotWindow::AddSystemMessage(QString line)
@@ -42,6 +44,7 @@ void BotWindow::AddSystemMessage(QString line)
     ui->textBuffer->setFontWeight(oldFontWeight * 2);
     ui->textBuffer->append("* " + line);
     ui->textBuffer->setFontWeight(oldFontWeight);
+    ScrollToEnd();
 }
 
 void BotWindow::GotFocus()
@@ -57,8 +60,7 @@ void BotWindow::Disable()
 void BotWindow::resizeEvent(QResizeEvent *event)
 {
     Q_UNUSED(event);
-    //ui->textBuffer->scrollToBottom();
-    ui->textBuffer->verticalScrollBar()->setValue(ui->textBuffer->verticalScrollBar()->maximum());
+    ScrollToEnd();
 }
 
 bool BotWindow::eventFilter(QObject *watched, QEvent *event)
@@ -103,6 +105,11 @@ bool BotWindow::eventFilter(QObject *watched, QEvent *event)
     }
     else
         return QWidget::eventFilter(watched, event);
+}
+
+void BotWindow::ScrollToEnd()
+{
+    ui->textBuffer->verticalScrollBar()->setValue(ui->textBuffer->verticalScrollBar()->maximum());
 }
 
 void BotWindow::commandEntered()
