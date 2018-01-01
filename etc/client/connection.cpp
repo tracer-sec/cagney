@@ -13,6 +13,7 @@ Connection::Connection(QObject *parent, QString hostname, quint16 port, QString 
 {
     connect(&socket_, &QSslSocket::encrypted, this, &Connection::connectionMade);
     connect(&socket_, &QTcpSocket::readyRead, this, &Connection::dataReady);
+    connect(&socket_, &QTcpSocket::disconnected, this, &Connection::disconnected);
     connect(&socket_, SIGNAL(sslErrors(const QList<QSslError> &)), this, SLOT(sslErrors(const QList<QSslError> &)));
 
     // load and apply cert
@@ -85,6 +86,12 @@ void Connection::dataReady()
             }
         }
     }
+}
+
+void Connection::disconnected()
+{
+    connected_ = false;
+    emit connectionLost();
 }
 
 void Connection::sslErrors(const QList<QSslError> &errors)

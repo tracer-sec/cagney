@@ -17,11 +17,13 @@ public:
 public slots:
     void connectionMade();
     void dataReady();
+    void disconnected();
     void sslErrors(const QList<QSslError> &errors);
 
 signals:
     void dataReceived(QString line);
     void connectionCompleted(QString hostname);
+    void connectionLost();
 
 private:
     QSslSocket socket_;

@@ -4,6 +4,7 @@
 #include "botinfodialog.h"
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QMessageBox>
 
 using namespace std;
 
@@ -168,6 +169,10 @@ void MainWindow::on_actionRefresh_triggered()
 
 void MainWindow::on_actionExit_triggered()
 {
+    // Stop us getting a 'connection lost' message on shutdown
+    if (connection_)
+        disconnect(connection_, &Connection::connectionLost, this, &MainWindow::connectionLost);
+
     QApplication::quit();
 }
 
@@ -192,6 +197,7 @@ void MainWindow::on_actionConnect_triggered()
         connection_ = new Connection(this, hostname, port, password, certPath);
         connect(connection_, &Connection::connectionCompleted,
             this, &MainWindow::connectionCompleted);
+        connect(connection_, &Connection::connectionLost, this, &MainWindow::connectionLost);
         connect(connection_, &Connection::dataReceived,
             this, &MainWindow::dataReceived);
         connection_->Connect();
@@ -215,4 +221,21 @@ void MainWindow::connectionCompleted(QString hostname)
     setWindowTitle("Cagney - " + hostname);
     statusLabel_->setText("CONNECTED");
     on_actionRefresh_triggered();
+}
+
+void MainWindow::connectionLost()
+{
+    QMessageBox::warning(this, "Connection Error", "Server connection lost");
+
+    ui->botList->clear();
+
+    setWindowTitle("Cagney");
+    statusLabel_->setText("DISCONNECTED");
+
+    for (auto childWindow : ui->messageWindowContainer->subWindowList())
+    {
+        auto w = reinterpret_cast<BotWindow *>(childWindow->widget());
+        w->AddSystemMessage("Server connection lost");
+        w->Disable();
+    }
 }
