@@ -77,7 +77,7 @@ string CustomCommandChannel::Receive()
         char buffer[4096];
         memset(buffer, 0, sizeof(buffer));
         auto bytesRead = socket_->Receive(buffer, sizeof(buffer));
-        if (bytesRead >= 0)
+        if (bytesRead > 0)
             remains_.append(buffer, bytesRead);
         else
             return "quit"; // Socket error
