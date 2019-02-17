@@ -6,6 +6,7 @@ build
 *.vcxproj.filters
 *.vcxproj.user
 etc/config.json
+etc/server_config.json
 etc/cc.cer
 etc/cert.pem
 etc/key.pem

@@ -13,11 +13,11 @@ BIN=$(BINDIR)/cagney
 
 all: setup $(BIN)
 
-$(BIN): $(OBJECTS) ; $(CC) $(LDFLAGS) $(OBJECTS) -o $@ -L../legit/bin -L../../lib/Botan-2.4.0 -llegit -lbotan-2 -lpthread
+$(BIN): $(OBJECTS) ; $(CC) $(LDFLAGS) $(OBJECTS) -o $@ -L../legit/bin -L../../lib/botan-2.9.0 -llegit -lbotan-2 -lpthread -lX11 -lz -lpng
 
-$(OBJDIR)/%.o: $(SRCDIR)/%.cpp ; $(CC) $(CFLAGS) -o $@ $< -I../legit/Legit -I../../lib/Botan-2.4.0/build/include
+$(OBJDIR)/%.o: $(SRCDIR)/%.cpp ; $(CC) $(CFLAGS) -o $@ $< -I../legit/Legit -I../../lib/botan-2.9.0/build/include
 
-clean: ; rm -f $(BINDIR)/* $(OBJDIR)/*
+clean: ; rm -f $(BINDIR)/cagney $(OBJDIR)/*
 
 setup: ; mkdir -p $(BINDIR) $(OBJDIR)
 
