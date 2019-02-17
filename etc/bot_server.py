@@ -22,7 +22,8 @@ class Message(object):
 
 
 class BotServer(object):
-    def __init__(self, host, bot_port, client_port):
+    def __init__(self, host, bot_port, client_port, client_password):
+        self.__client_password = client_password
         self.bots = []
         self.client = None
         self.__threads = []
@@ -72,7 +73,7 @@ class BotServer(object):
                                  ssl_version=ssl.PROTOCOL_TLSv1_2)
         if self.client == None:
             print('Accepting client from {0}'.format(client_address))
-            c = Client(stream, self)
+            c = Client(stream, self, self.__client_password)
             self.client = c
             t = threading.Thread(target=c.loop)
             t.daemon = True
@@ -190,8 +191,9 @@ class Bot(object):
 
         
 class Client(object):
-    def __init__(self, socket, server):
+    def __init__(self, socket, server, client_password):
         self.__socket = socket
+        self.__client_password = client_password
         self.__buffer = ''
         self.__running = False
         self.server = server
@@ -216,7 +218,7 @@ class Client(object):
                 print('CLIENT > {0}'.format(line))
                 self.server.on_client_message(line)
             else:
-                if line == PASSWORD:
+                if line == self.__client_password:
                     self.handshake_completed = True
                     print('CLIENT auth completed')
                     self.send('OK')
@@ -236,6 +238,9 @@ class Client(object):
         
 
 if __name__ == '__main__':
-    server = BotServer('', 8888, 9999)
+    f = open('server_config.json')
+    config = json.load(f)
+    f.close()
+    server = BotServer(config['server_host'], config['bot_port'], config['client_port'], config['client_password'])
     server.start()
     

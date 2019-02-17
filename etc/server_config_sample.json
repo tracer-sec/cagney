@@ -1,0 +1,7 @@
+{
+    "server_host": "",
+    "bot_port": 8888,
+    "client_port": 9999,
+    "client_password": "PASSWORD_LOL"
+}
+
